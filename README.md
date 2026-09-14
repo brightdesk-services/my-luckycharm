@@ -7,19 +7,40 @@ if you want it there while you work.
 Built with Jetpack Compose. The rope is a real verlet physics simulation, not a
 looping animation.
 
-<p>
-  <img src="docs/screenshots/app-home-tuning.png" width="260" alt="The charm hanging on its rope above the Tune sliders">
-  <img src="docs/screenshots/settings.png" width="260" alt="Settings: placement, pull controls and tap actions">
-</p>
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/app-home-tuning.png" width="260" alt="The charm hanging on its rope above the Tune sliders"><br>
+      <b>Tune</b><br>
+      <sub>Rope length, charm size and stretch, live under your finger</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/settings.png" width="260" alt="Settings: placement, pull controls and tap actions"><br>
+      <b>Settings</b><br>
+      <sub>Placement, what a pull does, what a tap does</sub>
+    </td>
+  </tr>
+</table>
 
-<p>
-  <img src="docs/screenshots/charms-art.png" width="380" alt="The Art tab of the charm sheet, showing all seventeen bundled charms">
-  <img src="docs/screenshots/charms-emoji.png" width="380" alt="The Emoji tab, with a named palette and a keyboard tile">
-</p>
-
-<p>
-  <img src="docs/screenshots/charms-photo.png" width="380" alt="The Photo tab, with a photo already chosen as the charm">
-</p>
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/charms-art.png" width="250" alt="The Art tab of the charm sheet, showing all seventeen bundled charms"><br>
+      <b>Charms</b><br>
+      <sub>Seventeen bundled charms, each one named</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/charms-emoji.png" width="250" alt="The Emoji tab, with a named palette and a keyboard tile"><br>
+      <b>Emoji</b><br>
+      <sub>A named palette, or type any emoji you like</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/charms-photo.png" width="250" alt="The Photo tab, with a photo already chosen as the charm"><br>
+      <b>Your own photo</b><br>
+      <sub>Pick one and it hangs on the rope</sub>
+    </td>
+  </tr>
+</table>
 
 ## What it does
 
