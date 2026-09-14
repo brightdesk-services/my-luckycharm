@@ -7,8 +7,19 @@ if you want it there while you work.
 Built with Jetpack Compose. The rope is a real verlet physics simulation, not a
 looping animation.
 
-<!-- Screenshots go here. Replace these with your own. -->
-<!-- <p><img src="branding/screenshot-home.png" width="240"> <img src="branding/screenshot-floating.png" width="240"></p> -->
+<p>
+  <img src="docs/screenshots/app-home-tuning.png" width="260" alt="The charm hanging on its rope above the Tune sliders">
+  <img src="docs/screenshots/settings.png" width="260" alt="Settings: placement, pull controls and tap actions">
+</p>
+
+<p>
+  <img src="docs/screenshots/charms-art.png" width="380" alt="The Art tab of the charm sheet, showing all seventeen bundled charms">
+  <img src="docs/screenshots/charms-emoji.png" width="380" alt="The Emoji tab, with a named palette and a keyboard tile">
+</p>
+
+<p>
+  <img src="docs/screenshots/charms-photo.png" width="380" alt="The Photo tab, with a photo already chosen as the charm">
+</p>
 
 ## What it does
 
