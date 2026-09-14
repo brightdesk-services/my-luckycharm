@@ -8,7 +8,16 @@ enum class PullAction { NONE, BRIGHTNESS, VOLUME }
 
 enum class CharmType { BUILT_IN, CUSTOM_IMAGE, EMOJI }
 
-enum class TapAction { NONE, TOGGLE_MUTE, TOGGLE_FLASHLIGHT }
+/**
+ * What a tap on the charm does.
+ *
+ * [PUT_AWAY] is the only one that is placement-specific: it dismisses a
+ * *floating* charm and does nothing in Fixed mode, where there is no overlay
+ * to put away. Settings therefore offers it on triple tap only — a single or
+ * double tap is far too easy to land by accident for a gesture whose whole
+ * effect is to make the charm disappear.
+ */
+enum class TapAction { NONE, TOGGLE_MUTE, TOGGLE_FLASHLIGHT, PUT_AWAY }
 
 data class AppSettings(
     val placementMode: PlacementMode = PlacementMode.FIXED,
@@ -42,7 +51,12 @@ data class AppSettings(
      */
     val singleTapAction: TapAction = TapAction.NONE,
     val doubleTapAction: TapAction = TapAction.NONE,
-    val tripleTapAction: TapAction = TapAction.NONE,
+    /**
+     * Put away by default: it is the only way to dismiss a floating charm
+     * without going back into the app, and three deliberate taps are hard to
+     * land by accident. The notification it leaves behind is the way back.
+     */
+    val tripleTapAction: TapAction = TapAction.PUT_AWAY,
 ) {
     companion object {
         const val DEFAULT_BUILT_IN_CHARM_ID = "lucky_cat"

@@ -109,8 +109,7 @@ fun SettingsScreen(
 
         if (settings.pullAction != PullAction.NONE) {
             Text(
-                "Pull the charm straight down to change this — swinging it sideways won't. " +
-                    "How far that pull can travel comes from Stretch, in Tune on the home screen.",
+                "Pull the charm down to change this. Sideways swings don't count.",
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -131,26 +130,47 @@ fun SettingsScreen(
         // second copy here would have invited the two to drift, the same reason
         // "Size and feel" left for Tune.
 
+        // Put away is offered on triple tap only. It is the one action that
+        // makes the charm disappear, and a single or double tap on something
+        // you also drag is far too easy to land by accident for that.
+        val everydayTapActions = TapAction.entries - TapAction.PUT_AWAY
+
         TapActionGroup(
             title = "Single tap",
+            options = everydayTapActions,
             selected = settings.singleTapAction,
             onSelect = { action -> onChange { it.copy(singleTapAction = action) } },
         )
         TapActionGroup(
             title = "Double tap",
+            options = everydayTapActions,
             selected = settings.doubleTapAction,
             onSelect = { action -> onChange { it.copy(doubleTapAction = action) } },
         )
-        // Triple tap stays hidden rather than deleted: the debounce/counting
-        // path in DreamcatcherSurface is fully implemented and settings.
-        // tripleTapAction still persists and fires if set, but it hasn't been
-        // exercised on hardware yet, unlike single/double tap.
+        TapActionGroup(
+            title = "Triple tap",
+            options = TapAction.entries,
+            selected = settings.tripleTapAction,
+            onSelect = { action -> onChange { it.copy(tripleTapAction = action) } },
+            // Nothing to put away while the charm lives inside this app, so the
+            // option greys out rather than silently doing nothing when picked.
+            enabled = { action ->
+                action != TapAction.PUT_AWAY ||
+                    settings.placementMode == PlacementMode.FLOATING
+            },
+        )
         if (settings.singleTapAction != TapAction.NONE ||
             settings.doubleTapAction != TapAction.NONE ||
             settings.tripleTapAction != TapAction.NONE
         ) {
             Text(
-                "Tap the charm itself — the rope and the anchor dash don't count.",
+                "Tap the charm itself, not the rope.",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        if (settings.tripleTapAction == TapAction.PUT_AWAY) {
+            Text(
+                "Three taps hide the floating charm. A notification brings it back.",
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
@@ -244,21 +264,25 @@ private fun PermissionRow(
 @Composable
 private fun TapActionGroup(
     title: String,
+    options: List<TapAction>,
     selected: TapAction,
     onSelect: (TapAction) -> Unit,
+    enabled: (TapAction) -> Boolean = { true },
 ) {
     OptionGroup(
         title = title,
-        options = TapAction.entries,
+        options = options,
         selected = selected,
         label = { action ->
             when (action) {
                 TapAction.NONE -> "Nothing"
                 TapAction.TOGGLE_MUTE -> "Toggle mute"
                 TapAction.TOGGLE_FLASHLIGHT -> "Toggle flashlight"
+                TapAction.PUT_AWAY -> "Put the floating charm away"
             }
         },
         onSelect = onSelect,
+        enabled = enabled,
     )
 }
 

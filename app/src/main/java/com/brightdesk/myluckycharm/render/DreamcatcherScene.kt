@@ -26,6 +26,12 @@ fun DreamcatcherScene(
     modifier: Modifier = Modifier,
     /** Floating mode's touch path; see [SurfaceTouchRelay]. */
     externalTouch: SurfaceTouchRelay? = null,
+    /**
+     * Dismisses the floating charm, for [TapAction.PUT_AWAY]. Null in Fixed
+     * mode and in Tuning's preview: there is no overlay to put away there, so
+     * the action simply does nothing rather than being faked with something else.
+     */
+    onPutAway: (() -> Unit)? = null,
     onGeometryChanged: ((CharmGeometry) -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -45,6 +51,7 @@ fun DreamcatcherScene(
             TapAction.NONE -> Unit
             TapAction.TOGGLE_MUTE -> volumeController.toggleMute()
             TapAction.TOGGLE_FLASHLIGHT -> flashlightController.toggle()
+            TapAction.PUT_AWAY -> onPutAway?.invoke()
         }
     }
 

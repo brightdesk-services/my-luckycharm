@@ -37,8 +37,12 @@ import com.brightdesk.myluckycharm.render.CharmGeometry
 import com.brightdesk.myluckycharm.render.DreamcatcherScene
 import com.brightdesk.myluckycharm.render.SurfaceTouchRelay
 import com.brightdesk.myluckycharm.settings.AppSettings
+import com.brightdesk.myluckycharm.settings.PlacementMode
 import com.brightdesk.myluckycharm.settings.SettingsRepository
 import com.brightdesk.myluckycharm.settings.settingsDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -140,6 +144,18 @@ class OverlayService : Service() {
         }
 
         startInForeground()
+        // Whatever started us, the charm is on screen again — so the "bring it
+        // back" notification a put-away tap left behind is now stale. Cancelled
+        // here rather than only in the restore branch, so floating it again
+        // from inside the app clears it too.
+        getSystemService(NotificationManager::class.java).cancel(BRING_BACK_NOTIFICATION_ID)
+        if (intent?.action == ACTION_RESTORE) {
+            settingsScope.launch {
+                SettingsRepository(settingsDataStore).update {
+                    it.copy(placementMode = PlacementMode.FLOATING)
+                }
+            }
+        }
         if (canvasView == null) showOverlay()
 
         // If the OS kills this under memory pressure the charm simply goes away
@@ -184,6 +200,7 @@ class OverlayService : Service() {
                         },
                         modifier = Modifier.fillMaxSize(),
                         externalTouch = relay,
+                        onPutAway = ::putAway,
                         onGeometryChanged = ::moveHandles,
                     )
                 }
@@ -404,13 +421,84 @@ class OverlayService : Service() {
         }
     }
 
-    private fun buildNotification(): Notification {
+    /**
+     * TapAction.PUT_AWAY: three taps on the charm dismiss it.
+     *
+     * The placement is written back to FIXED as well as the service stopped,
+     * because leaving it on FLOATING would have MainActivity's
+     * `LaunchedEffect(floating)` start the overlay straight back up the next
+     * time the app is opened — which reads as the gesture not working. That is
+     * a deliberate difference from the ongoing notification's "Put away"
+     * button, which only stops the service.
+     *
+     * Having written FIXED, though, the *only* way back would be opening the
+     * app, so the way back is left on screen: a dismissible notification whose
+     * action floats the charm again from wherever the user happens to be.
+     */
+    private fun putAway() {
+        // Deliberately not the composition's scope: stopSelf() disposes that
+        // composition, which would cancel this write along with it.
+        settingsScope.launch {
+            SettingsRepository(settingsDataStore).update {
+                it.copy(placementMode = PlacementMode.FIXED)
+            }
+        }
+        showBringBackNotification()
+        stopSelf()
+    }
+
+    /**
+     * The way back after [putAway], for a user who is in some other app.
+     *
+     * Not ongoing and auto-cancelling, unlike the foreground service's own
+     * notification: it is a one-shot offer the user is free to swipe away, and
+     * doing so simply means opening the app is the way back instead. Silent
+     * either way — it shares the service's IMPORTANCE_LOW channel.
+     *
+     * Its intent is a *foreground* service start, and it works from the
+     * background only because the user tapped a notification this app posted,
+     * which is one of the documented exemptions from the background
+     * foreground-service-start restrictions.
+     */
+    private fun showBringBackNotification() {
         val manager = getSystemService(NotificationManager::class.java)
+        ensureChannel(manager)
+
+        val restoreIntent = PendingIntent.getForegroundService(
+            this,
+            1,
+            Intent(this, OverlayService::class.java).setAction(ACTION_RESTORE),
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        manager.notify(
+            BRING_BACK_NOTIFICATION_ID,
+            Notification.Builder(this, CHANNEL_ID)
+                .setContentTitle("Charm put away")
+                .setContentText("Float it again without opening the app.")
+                .setSmallIcon(R.drawable.ic_charm_notification)
+                // The body and the button do the same thing: tapping the body
+                // to undo what you just dismissed is the obvious guess, and
+                // sending it to MainActivity instead would be exactly the trip
+                // through the app this notification exists to avoid.
+                .setContentIntent(restoreIntent)
+                .addAction(Notification.Action.Builder(null, "Bring it back", restoreIntent).build())
+                .setAutoCancel(true)
+                .build(),
+        )
+    }
+
+    private fun ensureChannel(manager: NotificationManager) {
         if (manager.getNotificationChannel(CHANNEL_ID) == null) {
             manager.createNotificationChannel(
                 NotificationChannel(CHANNEL_ID, "Floating charm", NotificationManager.IMPORTANCE_LOW),
             )
         }
+    }
+
+    private fun buildNotification(): Notification {
+        val manager = getSystemService(NotificationManager::class.java)
+        ensureChannel(manager)
 
         val stopIntent = PendingIntent.getService(
             this,
@@ -438,7 +526,25 @@ class OverlayService : Service() {
     companion object {
         const val ACTION_STOP = "com.brightdesk.myluckycharm.overlay.STOP"
 
+        /** Fired by the "bring it back" notification; see [showBringBackNotification]. */
+        const val ACTION_RESTORE = "com.brightdesk.myluckycharm.overlay.RESTORE"
+
+        /**
+         * Outlives any one service instance on purpose: [putAway] stops the
+         * service in the same breath as it writes the placement back, and a
+         * scope tied to the service (or to its composition) would be cancelled
+         * before that write landed.
+         */
+        private val settingsScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
         private const val NOTIFICATION_ID = 1
+
+        /**
+         * Separate from [NOTIFICATION_ID] so `stopForeground(STOP_FOREGROUND_REMOVE)`
+         * on the way out takes the "charm is floating" notification with it and
+         * leaves the one offering to bring it back.
+         */
+        private const val BRING_BACK_NOTIFICATION_ID = 2
         private const val CHANNEL_ID = "floating_charm"
 
         private const val HANDLE_MOVE_INTERVAL_MS = 80L
