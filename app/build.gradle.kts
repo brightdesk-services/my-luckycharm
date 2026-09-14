@@ -33,8 +33,8 @@ android {
         applicationId = "com.brightdesk.myluckycharm"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         buildConfigField("String", "POSTHOG_API_KEY", "\"${posthog("POSTHOG_API_KEY")}\"")
         buildConfigField(
