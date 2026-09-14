@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Dreamcatcher" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+    <!--
+      The same charm art as the launcher icon, cut out of the icon's own
+      background so it sits on @color/splash_background (#12101B, the same
+      NightSky MainActivity paints), and the splash reads as a continuation of
+      the icon rather than a separate screen. postSplashScreenTheme hands off to the real theme
+      once MainActivity's first frame is drawn.
+    -->
+    <style name="Theme.Dreamcatcher.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_charm</item>
+        <item name="postSplashScreenTheme">@style/Theme.Dreamcatcher</item>
+    </style>
+</resources>

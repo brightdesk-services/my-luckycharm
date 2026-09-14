@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The app's only network use: PostHog analytics, set up in DreamcatcherApp. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Normal permission, granted at install; needed for pull-to-volume. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- Special permission, granted via a Settings intent; needed for pull-to-brightness. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <!-- Special permission, granted via a Settings intent; needed for Floating mode. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Floating mode runs in a foreground service. No standard service type fits a
+         decorative overlay, so it declares specialUse. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- Runtime permission on API 33+. If denied the service still runs, but its
+         notification is hidden, which is why the app also offers a stop button. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Torch mode (tap-to-flashlight) needs no permission, but the flash itself
+         is optional hardware — required="false" keeps the app installable on
+         devices without one; FlashlightController already no-ops there. -->
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+
+    <application
+        android:name=".DreamcatcherApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Dreamcatcher">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|density"
+            android:theme="@style/Theme.Dreamcatcher.Starting">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".overlay.OverlayService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="A decorative charm the user explicitly chooses to keep on screen over other apps." />
+        </service>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,26 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.idsig
+
+# Hand-built APKs for sideloading onto test devices.
+/dist/
+
+# Upload/signing keys must never be committed. Losing one is recoverable
+# through Play App Signing; leaking one is not.
+*.jks
+*.keystore
+keystore.properties
+
+# The PostHog project key. Real analytics credentials stay out of the repo, and
+# a checkout without this file simply builds with analytics disabled.
+posthog.properties

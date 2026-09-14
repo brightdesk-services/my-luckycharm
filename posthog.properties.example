@@ -1,0 +1,6 @@
+# Copy this file to posthog.properties and fill in your own PostHog project
+# key to enable analytics. Without it the app builds and runs normally with
+# analytics switched off, which is what a fresh checkout gets — so a fork never
+# reports into someone else's PostHog project.
+POSTHOG_API_KEY=
+POSTHOG_HOST=https://us.i.posthog.com
