@@ -20,6 +20,9 @@
 *.jks
 *.keystore
 keystore.properties
+# The F-Droid release key is separate from the Play upload key, and its
+# certificate is pinned permanently in F-Droid's AllowedAPKSigningKeys.
+fdroid-keystore.properties
 
 # The PostHog project key. Real analytics credentials stay out of the repo, and
 # a checkout without this file simply builds with analytics disabled.

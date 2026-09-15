@@ -1,0 +1,2 @@
+* F-Droid releases are now signed with a dedicated key and published as
+  reproducible builds, so the APK you install is the one built here

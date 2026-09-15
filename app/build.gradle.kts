@@ -10,15 +10,27 @@ val posthogProps = Properties().apply {
 fun posthog(key: String, fallback: String = "") =
     (posthogProps.getProperty(key) ?: fallback).trim()
 
-// Release signing credentials, also kept out of the repo. When the file is
-// absent — anyone else's checkout — the release build simply produces an
-// unsigned APK instead of failing, so the project still builds for a fork.
-val keystoreProps = Properties().apply {
-    val file = rootProject.file("keystore.properties")
+// Release signing credentials, also kept out of the repo. When a file is
+// absent — anyone else's checkout, and F-Droid's builder — the release build
+// simply produces an unsigned APK instead of failing, so the project still
+// builds for a fork. F-Droid relies on that: it builds unsigned, then verifies
+// its output against the signed APK published alongside the tag.
+//
+// The two distributions sign with *different* keys on purpose. `play` uses the
+// Play upload key; `foss` uses a key dedicated to F-Droid, whose certificate
+// F-Droid pins permanently in AllowedAPKSigningKeys. Keeping them apart means
+// neither can be rotated or compromised on the other's behalf.
+fun loadProps(name: String) = Properties().apply {
+    val file = rootProject.file(name)
     if (file.exists()) file.inputStream().use { load(it) }
 }
-val hasSigning = keystoreProps.getProperty("storeFile")
-    ?.let { rootProject.file(it).exists() } == true
+fun Properties.keystoreExists() =
+    getProperty("storeFile")?.let { rootProject.file(it).exists() } == true
+
+val keystoreProps = loadProps("keystore.properties")
+val fdroidKeystoreProps = loadProps("fdroid-keystore.properties")
+val hasSigning = keystoreProps.keystoreExists()
+val hasFdroidSigning = fdroidKeystoreProps.keystoreExists()
 
 plugins {
     alias(libs.plugins.android.application)
@@ -33,9 +45,28 @@ android {
         applicationId = "com.brightdesk.myluckycharm"
         minSdk = 26
         targetSdk = 37
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
+    }
+
+    signingConfigs {
+        if (hasSigning) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+        if (hasFdroidSigning) {
+            create("fdroid") {
+                storeFile = rootProject.file(fdroidKeystoreProps.getProperty("storeFile"))
+                storePassword = fdroidKeystoreProps.getProperty("storePassword")
+                keyAlias = fdroidKeystoreProps.getProperty("keyAlias")
+                keyPassword = fdroidKeystoreProps.getProperty("keyPassword")
+            }
+        }
     }
 
     // Two distributions of the same app. `play` is the Play Store build and
@@ -48,9 +79,23 @@ android {
     productFlavors {
         create("foss") {
             dimension = "distribution"
+
+            // Signed here rather than in buildTypes because the two flavors use
+            // different keys — and a buildType signingConfig *overrides* a
+            // flavor one, so setting it in `release` would silently sign both
+            // flavors with the Play upload key. Absent the keystore this stays
+            // null and the release APK comes out unsigned, which is exactly
+            // what F-Droid's builder produces and compares against.
+            if (hasFdroidSigning) {
+                signingConfig = signingConfigs.getByName("fdroid")
+            }
         }
         create("play") {
             dimension = "distribution"
+
+            if (hasSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
 
             buildConfigField("String", "POSTHOG_API_KEY", "\"${posthog("POSTHOG_API_KEY")}\"")
             buildConfigField(
@@ -61,20 +106,11 @@ android {
         }
     }
 
-    signingConfigs {
-        if (hasSigning) {
-            create("release") {
-                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
-                storePassword = keystoreProps.getProperty("storePassword")
-                keyAlias = keystoreProps.getProperty("keyAlias")
-                keyPassword = keystoreProps.getProperty("keyPassword")
-            }
-        }
-    }
 
     buildTypes {
         release {
-            signingConfig = if (hasSigning) signingConfigs.getByName("release") else null
+            // Deliberately no signingConfig: each flavor sets its own, and a
+            // value here would override both.
             // Nothing here is reflection-heavy — the one dynamic lookup,
             // BrightnessRange.ofSystem, resolves framework resources in the
             // "android" package, which app resource shrinking never touches.
