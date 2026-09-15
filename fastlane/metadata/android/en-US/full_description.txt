@@ -1,0 +1,43 @@
+Hang a lucky charm on your screen and give it a pull.
+
+My Lucky Charm puts a charm on a rope at the top of your display. It hangs
+there, it sways, and it swings when you flick it — a real rope simulation, not
+an animation on a loop. Drag it out to the side and let go, and it whips back
+the way a charm on a cord actually would.
+
+<b>Pick your charm</b>
+Seventeen charms are built in — a lucky cat, a horseshoe, an evil eye, a hamsa,
+a scarab, a daruma, an oni mask, a temple bell, a lucky knot, an ash gourd, a
+string of chillies and lemon, two om charms, a moon and star, a 786 medallion,
+and two crosses. Prefer an emoji? There is a curated palette of them, each one
+named so you are not guessing at a tiny glyph, and you can type any other emoji
+your keyboard offers. Or hang a photo of your own: pick one and it goes
+straight onto the rope.
+
+<b>Pull it to do something</b>
+A pull can be just a pull. Or you can set it to control screen brightness or
+media volume — pull down for more, push up for less. It adjusts from wherever
+the setting already is, so grabbing the charm in the middle of a video nudges
+the volume rather than resetting it. A sideways swing leaves it alone entirely.
+
+Tapping does something too, if you want it to: set a single, double, or triple
+tap on the charm to toggle the flashlight or mute the sound.
+
+<b>Keep it while you use other apps</b>
+Floating mode hangs the charm over everything else on your screen. It is
+genuinely see-through: every tap except one on the charm itself goes to the app
+underneath, so nothing is in your way. A notification with a stop button is
+always there while it runs.
+
+<b>Make it yours</b>
+Drag the charm's anchor anywhere along the top. Tune the rope length, the charm
+size, and how far the rope stretches, and watch it change under your finger as
+you drag the slider. Turn on tilt and the charm swings with the way you hold
+your phone.
+
+<b>No account, no ads, no network</b>
+This F-Droid build asks for no internet permission at all. There is no
+sign-in, no ads, and no analytics of any kind — the analytics SDK is not merely
+switched off, it is absent from the build. Your settings and any photo you
+choose stay in the app's private storage on your device, and uninstalling
+removes them.

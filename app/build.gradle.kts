@@ -33,15 +33,32 @@ android {
         applicationId = "com.brightdesk.myluckycharm"
         minSdk = 26
         targetSdk = 37
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
-        buildConfigField("String", "POSTHOG_API_KEY", "\"${posthog("POSTHOG_API_KEY")}\"")
-        buildConfigField(
-            "String",
-            "POSTHOG_HOST",
-            "\"${posthog("POSTHOG_HOST", "https://us.i.posthog.com")}\"",
-        )
+    }
+
+    // Two distributions of the same app. `play` is the Play Store build and
+    // carries PostHog; `foss` is what F-Droid builds and has no analytics
+    // dependency, no analytics code and no INTERNET permission. The
+    // applicationId is deliberately the same in both — they are the same app,
+    // and F-Droid lists it under the id users already have.
+    flavorDimensions += "distribution"
+
+    productFlavors {
+        create("foss") {
+            dimension = "distribution"
+        }
+        create("play") {
+            dimension = "distribution"
+
+            buildConfigField("String", "POSTHOG_API_KEY", "\"${posthog("POSTHOG_API_KEY")}\"")
+            buildConfigField(
+                "String",
+                "POSTHOG_HOST",
+                "\"${posthog("POSTHOG_HOST", "https://us.i.posthog.com")}\"",
+            )
+        }
     }
 
     signingConfigs {
@@ -101,7 +118,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.posthog.android)
+    "playImplementation"(libs.posthog.android)
 
     debugImplementation(libs.androidx.ui.tooling)
 

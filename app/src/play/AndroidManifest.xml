@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The app's only network use: PostHog analytics, set up in Analytics.kt.
+         Declared per-flavor rather than in the main manifest so the `foss`
+         build F-Droid produces asks for no network access at all. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

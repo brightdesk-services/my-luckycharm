@@ -1,0 +1,3 @@
+* Triple-tap a floating charm to put it away, with a notification to bring it back
+* Seventeen bundled charms, a named emoji palette, and your own photos
+* Pull the charm to control screen brightness or media volume

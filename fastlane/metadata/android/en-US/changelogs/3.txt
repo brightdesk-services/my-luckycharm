@@ -1,0 +1,3 @@
+* First F-Droid release
+* Split into two builds: the F-Droid one has no analytics SDK and asks for no
+  internet permission at all
