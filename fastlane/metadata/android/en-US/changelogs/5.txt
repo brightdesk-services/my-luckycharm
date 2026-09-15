@@ -1,0 +1,2 @@
+* Removed the dependency-metadata block AGP embeds in the APK signature, so
+  the F-Droid build carries nothing that cannot be audited from source

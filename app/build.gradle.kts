@@ -45,8 +45,8 @@ android {
         applicationId = "com.brightdesk.myluckycharm"
         minSdk = 26
         targetSdk = 37
-        versionCode = 4
-        versionName = "1.3"
+        versionCode = 5
+        versionName = "1.4"
 
     }
 
@@ -123,6 +123,18 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    // AGP otherwise embeds a Google-encrypted blob of the dependency tree in
+    // the APK's signing block. F-Droid's scanner rejects any extra signing
+    // block outright — it is an opaque payload it cannot audit — and fails the
+    // build with "found extra signing block 'Dependency metadata'".
+    //
+    // Left on for the bundle, which is what Play receives: Play reads it to
+    // warn about known-vulnerable dependencies, and nothing there objects.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = true
     }
 
     buildFeatures {
